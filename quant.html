@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quant Projects | Pratik Kafle</title>
+  <meta name="description" content="Pratik Kafle: Physics Ph.D. candidate at Michigan State University (ATLAS, CERN) seeking quantitative research roles. Statistics, Monte Carlo, machine learning, C++ and Python.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Source+Serif+4:wght@600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <div class="container">
+      <a href="index.html" class="site-title">Pratik Kafle</a>
+      <nav>
+        <a href="index.html">About</a>
+        <a href="background.html">Background</a>
+        <a href="quant.html" class="active">Quant Projects</a>
+        <a href="research.html">Research</a>
+        <a href="outreach.html">Outreach</a>
+        <a href="connect.html">Connect</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <h1>Quant Projects</h1>
+    <p class="tagline">Quantitative finance work: volatility forecasting, option pricing and stochastic calculus.</p>
+
+    <div>
+      <article class="project">
+        <h3>Volatility Forecasting &amp; Option Pricing with Stochastic-Vol Models and ML</h3>
+        <div class="where">Erd&#337;s Institute, Quantitative Finance capstone · Fall 2026</div>
+        <p>I wanted to know whether the textbook option-pricing models can be pushed further. If you take the Heston stochastic-volatility model and add momentum, jumps or machine learning, does it forecast volatility better? And can it beat what the option market already implies?</p>
+        <p>To find out, I built a walk-forward pipeline in Python covering 48 assets and 18 asset/vol-index pairs over more than 30 years. Everything is out-of-sample: the models are refit once a year on past data only, with a 21-day gap so nothing leaks from the future. Every comparison comes with a proper significance test (Newey&ndash;West or Diebold&ndash;Mariano).</p>
+        <p><strong>What I found:</strong></p>
+        <ul>
+          <li><strong>Plain Heston is hard to beat.</strong> Its mean reversion alone forecasts 1-month implied volatility with a 10.6% out-of-sample R&sup2; over a random walk, and it wins in 16 of 18 markets. None of my extensions did significantly better, and stacking them all together just overfit.</li>
+          <li><strong>Jumps fix the smile.</strong> I calibrated Heston, Bates (Heston plus jumps) and double-Heston to SPY option chains using Fourier pricing. Adding jumps cut the smile pricing error by 32%. So far this rests on a single day of option data, so I treat it as promising rather than settled.</li>
+          <li><strong>A foundation model works best as a partner.</strong> On 20 global indices, Google's TimesFM lost to the classic HAR model when used on its own. Averaging the two beat HAR in all 20 markets (pooled Diebold&ndash;Mariano t&nbsp;=&nbsp;&minus;7.75). I ran the fine-tuning and evaluation on A100 GPUs on MSU's HPC cluster.</li>
+          <li><strong>Machine learning needs to be pooled.</strong> Gradient boosting trained on one market at a time falls apart in volatility spikes, because trees can't extrapolate past what they've seen. A single scale-free model trained on all 18 markets matched the option market's own forecast.</li>
+          <li><strong>I tested my tests.</strong> I ran simulated markets (5,000 paths per setting, on HPC job arrays) through the exact same pipeline. A standard momentum-in-volatility test came out positive 74% of the time even when no momentum was there; it was picking up the leverage effect instead. That told me which of my results to trust.</li>
+          <li><strong>The profit that wasn't.</strong> Selling delta-hedged options across 18 markets looked profitable. Hedging made P&amp;L 2.3&times; less volatile and cut the worst loss from &minus;112 to &minus;41 vol points. But the vol index sits above at-the-money volatility, and that bias alone could explain the apparent edge.</li>
+          <li><strong>How stocks move together.</strong> Across 469 S&amp;P&nbsp;500 stocks, random matrix theory separates about 21 real factors from noise. Correlations jump in crashes far more than a Gaussian model would predict, and a downside-trend signal improves next-month correlation forecasts (R&sup2; from 26% to 31%).</li>
+        </ul>
+        <div class="gallery">
+          <figure>
+            <img src="images/web/corr-heatmap-sector.png" alt="Heatmap of daily log-return correlations for 469 S&amp;P 500 stocks, 2016 to 2026, ordered by GICS sector; sector blocks show higher correlation along the diagonal" loading="lazy">
+            <figcaption>Daily return correlations of 469 S&amp;P&nbsp;500 stocks (2016&ndash;2026), ordered by sector.</figcaption>
+          </figure>
+          <figure>
+            <img src="images/web/exceedance-corr.png" alt="Conditional correlation of S&amp;P 500 stocks with the index by exceedance quantile, around 0.5 to 0.65, compared with about 0.15 to 0.3 for a bivariate Gaussian with the same correlation; the gap is largest when both fall" loading="lazy">
+            <figcaption>In joint selloffs, stocks move together far more than a Gaussian model allows.</figcaption>
+          </figure>
+        </div>
+        <p class="tools">Tools: Python (NumPy, pandas, SciPy, scikit-learn, PyTorch), Heston/Bates models, Fourier option pricing, HAR, GARCH, Monte Carlo, HPC (SLURM, A100)</p>
+        <!-- TODO: add GitHub link once github.com/prakafle/heston-momentum is public -->
+      </article>
+
+      <article class="project">
+        <h3>Brownian Motion in Finance: A Simulation Notebook</h3>
+        <div class="where">Self-study · 2026</div>
+        <p>Coming from physics, I knew random walks and diffusion well, but not how finance uses them. Rather than just read Shreve and nod along, I wrote a notebook where every result gets checked with a simulation.</p>
+        <p>It starts with coin flips and builds up to Brownian motion, quadratic variation, martingales and It&ocirc;'s lemma. From there it covers geometric Brownian motion, simulating SDEs (Euler&ndash;Maruyama, Milstein), Black&ndash;Scholes, Monte Carlo pricing with variance reduction (Asian options), delta hedging, barrier and first-passage problems, and mean reversion (Ornstein&ndash;Uhlenbeck / Vasicek).</p>
+        <p>A few things clicked once I saw them in the numbers. A delta-hedged option breaks even on average even when the stock drifts up 12% a year, so the drift really does drop out. And sampling prices every 5 minutes instead of weekly makes the volatility estimate about 20&times; more precise but tells you nothing more about the drift. That one fact explains a lot: options can be priced well, but predicting returns is hard.</p>
+        <figure>
+          <img src="images/web/brownian-paths.png" alt="Forty simulated Brownian paths over three years, spreading out inside dashed one- and two-standard-deviation envelopes that grow like the square root of time" loading="lazy">
+          <figcaption>40 Brownian paths: the spread grows like &radic;t.</figcaption>
+        </figure>
+        <figure class="wide">
+          <img src="images/web/gbm-mean-vs-median.png" alt="Left: simulated geometric Brownian motion paths on a log scale with the mean rising and the median falling. Right: histogram of prices after 10 years matching a lognormal density, median 75 and mean 165" loading="lazy">
+          <figcaption>Volatility drag: with 5% drift and 40% vol, the average path grows to 165 but the typical one shrinks to 75.</figcaption>
+        </figure>
+        <p><a href="https://github.com/prakafle/brownian_motion_in_finance">Notebook on GitHub</a></p>
+        <p class="tools">Tools: Python, NumPy, SciPy, Matplotlib, Monte Carlo</p>
+      </article>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      &copy; 2026 Pratik Kafle &middot; Last updated: October 2026
+    </div>
+  </footer>
+</body>
+</html>
