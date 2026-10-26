@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Research | Pratik Kafle</title>
+  <meta name="description" content="Pratik Kafle: Physics Ph.D. candidate at Michigan State University (ATLAS, CERN) seeking quantitative research roles. Statistics, Monte Carlo, machine learning, C++ and Python.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Source+Serif+4:wght@600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <div class="container">
+      <a href="index.html" class="site-title">Pratik Kafle</a>
+      <nav>
+        <a href="index.html">About</a>
+        <a href="background.html">Background</a>
+        <a href="quant.html">Quant Projects</a>
+        <a href="research.html" class="active">Research</a>
+        <a href="outreach.html">Outreach</a>
+        <a href="connect.html">Connect</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <h1>Research</h1>
+    <h2>Papers in progress</h2>
+    <ul class="plain">
+      <li><strong>Optimal observables for CP violation in the Higgs–gluon coupling in
+        H&rarr;&gamma;&gamma; plus two jets at the LHC</strong> (theory paper, in preparation)<br>
+        <span class="tools"><strong>P. Kafle</strong>, K. Mohan, M. Yanez, N. Parekh, and J. Huston</span><br>
+        Constrains the CP-violating part of the Higgs–gluon coupling using optimal observables in a profile-likelihood fit.
+        <figure class="paper-fig wide">
+          <img src="images/web/cp-oo1xoo2.png" alt="Five two-dimensional histograms of the optimal observables O1 (interference) against O2 (CP-odd squared) at particle level, for couplings (a_t, b_t) = (1,0) Standard Model, (0,1) pure CP-odd, (1,1), (1,-1) and (0.5,0.3), each peaking near O1 = 0, O2 = 2" loading="lazy">
+          <figcaption>Joint distribution of the two optimal observables, O<sub>1</sub> (interference) and O<sub>2</sub> (CP-odd squared), at five values of the CP-even (a<sub>t</sub>) and CP-odd (b<sub>t</sub>) couplings. Particle-level simulation of H&rarr;&gamma;&gamma; + &ge;2 jets at 13.6&nbsp;TeV.</figcaption>
+        </figure>
+        <figure class="paper-fig wide">
+          <img src="images/web/cp-oo1xoo2-ratio.png" alt="Ratio of each non-Standard-Model distribution to the Standard Model one. Pure CP-odd moves events to higher O2; (1,1) moves them toward positive O1 and (1,-1) toward negative O1, with blue (fewer) and red (more) bands tilted in opposite directions" loading="lazy">
+          <figcaption>The same distributions divided by the Standard Model shape. A CP-odd coupling pushes events up in O<sub>2</sub>, and its sign shows up as a tilt in O<sub>1</sub>: (1,&nbsp;1) and (1,&nbsp;&minus;1) lean in opposite directions.</figcaption>
+        </figure>
+        <figure class="paper-fig wide">
+          <img src="images/web/cp-contour-oo-vs-dphi.png" alt="Expected 68% and 95% confidence regions in the plane of the CP-odd coupling b_t (horizontal) and CP-even coupling a_t (vertical), at 300 and 3000 inverse femtobarns. Filled blue regions from the optimal observables are tighter than the dashed orange regions from the signed jet angle, especially at 3000 inverse femtobarns" loading="lazy">
+          <figcaption>Expected 68% and 95% CL regions for the CP-even (a<sub>t</sub>) and CP-odd (b<sub>t</sub>) top&ndash;Higgs couplings: optimal observables (blue) vs the standard signed &Delta;&phi;<sub>jj</sub> (orange), with 300 and 3000&nbsp;fb<sup>&minus;1</sup>. Detector-level simulation, statistical uncertainties only.</figcaption>
+        </figure></li>
+      <li><strong>Measurement of fiducial and differential cross sections in the H&rarr;&gamma;&gamma; decay channel with 168&nbsp;fb<sup>&minus;1</sup> of 13.6&nbsp;TeV proton&ndash;proton collision data with the ATLAS detector</strong> (ATLAS Collaboration, in preparation)</li>
+    </ul>
+
+    <h2>Projects</h2>
+
+    <div>
+      <article class="project">
+        <h3>Photon Isolation Calibration &amp; Uncertainty Framework</h3>
+        <div class="where">ATLAS, CERN · 2022 – present</div>
+        <p><strong>Problem:</strong> Simulation doesn't perfectly match real detector data, so the mismatch must be measured and corrected, with an honest error bar.</p>
+        <p><strong>Approach:</strong> Derived a data-driven shift and scale factor, developed new methods to quantify the uncertainties, and built an end-to-end Python and C++ package that automates the derivation and propagates systematic uncertainties in one pipeline.</p>
+        <p><strong>Result:</strong> Adopted in the official ATLAS Run&nbsp;3 recommendation used by analyses across the collaboration.</p>
+        <p class="tools">Tools: C++, Python, ROOT, uncertainty quantification</p>
+      </article>
+
+      <article class="project">
+        <h3>Machine-Learning Signal Classification</h3>
+        <div class="where">ATLAS, CERN</div>
+        <p><strong>Problem:</strong> Rare Higgs signal events are buried under far more numerous background events with similar features.</p>
+        <p><strong>Approach:</strong> Engineered physics-motivated features and trained boosted-decision-tree and neural-network classifiers to discriminate signal from background; used them to optimize di-Higgs and high-transverse-momentum Higgs search sensitivity.</p>
+        <p><strong>Result:</strong> Improved signal/background separation; presented at the CAMPFIRE Workshop (2023).</p>
+        <p class="tools">Tools: Python, scikit-learn, boosted decision trees, neural networks, feature engineering</p>
+      </article>
+
+      <article class="project">
+        <h3>Selection Optimization &amp; Bias Control (H&rarr;&gamma;&gamma;)</h3>
+        <div class="where">ATLAS, CERN</div>
+        <p><strong>Problem:</strong> A tighter selection raises purity but loses efficiency, and it can distort (sculpt) the background distribution. This is the same problem as overfitting and look-ahead bias in backtesting.</p>
+        <p><strong>Approach:</strong> Built a framework to scan a new selection cut, optimized it on efficiency vs. purity, explicitly measured the sculpting it induced, and computed the K-factor correction.</p>
+        <p><strong>Result:</strong> A tuned, bias-checked selection for the differential cross-section measurement; presented at the HGamma meeting (2023).</p>
+        <p class="tools">Tools: Python, ROOT, optimization, bias control</p>
+      </article>
+
+      <article class="project">
+        <h3>Monte Carlo Simulation of Neutrino Propagation</h3>
+        <div class="where">Harvard University · 2021</div>
+        <p><strong>Problem:</strong> Estimate how tau neutrinos propagate through the Earth to inform the design of the proposed TAMBO detector.</p>
+        <p><strong>Approach:</strong> Wrote stochastic Monte Carlo simulations in Python and C++.</p>
+        <p><strong>Result:</strong> Simulation inputs for the detector design study.</p>
+        <p class="tools">Tools: Python, C++, Monte Carlo</p>
+      </article>
+
+      <article class="project">
+        <h3>Numerical Solution of the 2D Schr&ouml;dinger–Newton Equation</h3>
+        <div class="where">Reed College · 2021 – 2022</div>
+        <p><strong>Problem:</strong> A nonlinear PDE coupling quantum mechanics and gravity, with no closed-form solution.</p>
+        <p><strong>Approach:</strong> Implemented numerical solvers for the two-dimensional case.</p>
+        <p><strong>Result:</strong> Undergraduate research; later presented as "Two-Body Gravity and Quantum Mechanics" (MSU, 2026).</p>
+        <p class="tools">Tools: numerical methods, PDEs</p>
+      </article>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      &copy; 2026 Pratik Kafle &middot; Last updated: October 2026
+    </div>
+  </footer>
+</body>
+</html>

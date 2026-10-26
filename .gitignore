@@ -1,0 +1,8 @@
+current_resume/
+.DS_Store
+
+# Original full-size photos (may contain GPS metadata); site uses images/web/
+images/*.HEIC
+images/nepali_night_pk.JPEG
+images/pk_bench_press.jpeg
+images/pk_hiking.JPG
