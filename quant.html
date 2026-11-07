@@ -32,7 +32,7 @@
     <div>
       <article class="project">
         <h3>Momentum, Heston and Machine Learning: Can a Better Equation Predict Option Prices?</h3>
-        <div class="where">Erd&#337;s Institute, Quantitative Finance capstone · Fall 2026 · <a href="https://github.com/prakafle/heston-momentum">Code and results on GitHub</a></div>
+        <div class="where">Erd&#337;s Institute, Quantitative Finance capstone · Fall 2026</div>
         <p>The Heston stochastic-volatility model is the textbook equation for option prices. I wanted to know whether it can be pushed further. If you add <strong>momentum</strong> (a trend term in the variance), jumps, a second variance factor or machine learning, do you get better forecasts of option prices than plain Heston and the market itself?</p>
         <p>One fact shaped the whole project. Momentum in the <em>drift</em> of the price can't change option prices at all, because the risk-neutral measure replaces the drift with the interest rate. Only momentum in the <em>variance</em> can. So I asked three separate questions. Does trend predict returns? Does it predict volatility? And is it already in option prices?</p>
 
@@ -122,7 +122,7 @@
         <h4>What I took away</h4>
         <p>Momentum is real in volatility but not in returns, and the option market already prices it. What adds predictive value is the <em>structure</em> of the known equation. Heston's mean reversion forecasts implied vol, and jumps price the smile. Extra state variables and naive machine learning mostly overfit. The hardest part wasn't building models. It was not fooling myself: preventing leaks, using the right t-stats, checking what price I was really trading at, and asking whether a test could have said "yes" at all.</p>
         <p class="tools">Tools: Python (NumPy, pandas, SciPy, scikit-learn, PyTorch), Heston/Bates/double-Heston models, Fourier option pricing, HAR, GARCH, TimesFM, Monte Carlo, OptionMetrics (WRDS), HPC (SLURM, A100)</p>
-        <p><a href="https://github.com/prakafle/heston-momentum">Code, logs and full results on GitHub</a></p>
+        <p><a href="https://github.com/prakafle/heston-momentum">Code on GitHub</a></p>
       </article>
 
       <article class="project">
