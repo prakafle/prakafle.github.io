@@ -176,3 +176,9 @@ footer {
 .collision-anim { margin: 28px auto 0; max-width: 520px; }
 .collision-anim img { aspect-ratio: auto; object-fit: contain; border-radius: 0; }
 .collision-anim figcaption { text-align: center; }
+.project h4 { font-size: 1rem; font-weight: 600; margin: 22px 0 6px; }
+.table-wrap { overflow-x: auto; margin: 10px 0; }
+.project table { border-collapse: collapse; font-size: 0.9rem; width: 100%; }
+.project th, .project td { text-align: left; padding: 5px 10px; border-bottom: 1px solid var(--line); }
+.project th { font-weight: 600; }
+.project td:not(:first-child), .project th:not(:first-child) { text-align: right; white-space: nowrap; }

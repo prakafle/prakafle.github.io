@@ -31,20 +31,75 @@
 
     <div>
       <article class="project">
-        <h3>Volatility Forecasting &amp; Option Pricing with Stochastic-Vol Models and ML</h3>
-        <div class="where">Erd&#337;s Institute, Quantitative Finance capstone · Fall 2026</div>
-        <p>I wanted to know whether the textbook option-pricing models can be pushed further. If you take the Heston stochastic-volatility model and add momentum, jumps or machine learning, does it forecast volatility better? And can it beat what the option market already implies?</p>
-        <p>To find out, I built a walk-forward pipeline in Python covering 48 assets and 18 asset/vol-index pairs over more than 30 years. Everything is out-of-sample: the models are refit once a year on past data only, with a 21-day gap so nothing leaks from the future. Every comparison comes with a proper significance test (Newey&ndash;West or Diebold&ndash;Mariano).</p>
-        <p><strong>What I found:</strong></p>
+        <h3>Momentum, Heston and Machine Learning: Can a Better Equation Predict Option Prices?</h3>
+        <div class="where">Erd&#337;s Institute, Quantitative Finance capstone · Fall 2026 · <a href="https://github.com/prakafle/heston-momentum">Code and results on GitHub</a></div>
+        <p>The Heston stochastic-volatility model is the textbook equation for option prices. I wanted to know whether it can be pushed further. If you add <strong>momentum</strong> (a trend term in the variance), jumps, a second variance factor or machine learning, do you get better forecasts of option prices than plain Heston and the market itself?</p>
+        <p>One fact shaped the whole project. Momentum in the <em>drift</em> of the price can't change option prices at all, because the risk-neutral measure replaces the drift with the interest rate. Only momentum in the <em>variance</em> can. So I asked three separate questions. Does trend predict returns? Does it predict volatility? And is it already in option prices?</p>
+
+        <h4>How I set it up</h4>
         <ul>
-          <li><strong>Plain Heston is hard to beat.</strong> Its mean reversion alone forecasts 1-month implied volatility with a 10.6% out-of-sample R&sup2; over a random walk, and it wins in 16 of 18 markets. None of my extensions did significantly better, and stacking them all together just overfit.</li>
-          <li><strong>Jumps fix the smile.</strong> I calibrated Heston, Bates (Heston plus jumps) and double-Heston to SPY option chains using Fourier pricing. Adding jumps cut the smile pricing error by 32%. So far this rests on a single day of option data, so I treat it as promising rather than settled.</li>
-          <li><strong>A foundation model works best as a partner.</strong> On 20 global indices, Google's TimesFM lost to the classic HAR model when used on its own. Averaging the two beat HAR in all 20 markets (pooled Diebold&ndash;Mariano t&nbsp;=&nbsp;&minus;7.75). I ran the fine-tuning and evaluation on A100 GPUs on MSU's HPC cluster.</li>
-          <li><strong>Machine learning needs to be pooled.</strong> Gradient boosting trained on one market at a time falls apart in volatility spikes, because trees can't extrapolate past what they've seen. A single scale-free model trained on all 18 markets matched the option market's own forecast.</li>
-          <li><strong>I tested my tests.</strong> I ran simulated markets (5,000 paths per setting, on HPC job arrays) through the exact same pipeline. A standard momentum-in-volatility test came out positive 74% of the time even when no momentum was there; it was picking up the leverage effect instead. That told me which of my results to trust.</li>
-          <li><strong>The profit that wasn't.</strong> Selling delta-hedged options across 18 markets looked profitable. Hedging made P&amp;L 2.3&times; less volatile and cut the worst loss from &minus;112 to &minus;41 vol points. But the vol index sits above at-the-money volatility, and that bias alone could explain the apparent edge.</li>
-          <li><strong>How stocks move together.</strong> Across 469 S&amp;P&nbsp;500 stocks, random matrix theory separates about 21 real factors from noise. Correlations jump in crashes far more than a Gaussian model would predict, and a downside-trend signal improves next-month correlation forecasts (R&sup2; from 26% to 31%).</li>
+          <li><strong>Data:</strong> 48 assets (indices, sectors, countries, bonds, commodities, FX and single stocks) going back as far as 1985. I added 18 Cboe implied-vol indices paired with their underlyings (VIX/SPX, VXN/NDX, GVZ/gold, OVX/oil, VXAPL and more), plus SPY option chains and a full year of SPX option prices from OptionMetrics (WRDS).</li>
+          <li><strong>No look-ahead:</strong> every model is refit once a year on past data only. An expanding window and a 21-day embargo keep overlapping targets from leaking future information.</li>
+          <li><strong>Honest statistics:</strong> targets overlap from day to day, so every comparison uses Newey&ndash;West or Diebold&ndash;Mariano t-stats. When I pool many markets, I average across markets on each date first.</li>
+          <li><strong>Rules fixed in advance:</strong> I wrote down the design of the hedging backtest and the OptionMetrics tests before running them. Anything I came up with after seeing results is labelled post-hoc.</li>
         </ul>
+
+        <h4>1. Forecasting implied volatility: plain Heston is hard to beat</h4>
+        <p>The target was implied volatility 21 days ahead, averaged over the 18 markets. I scored each model by its out-of-sample R&sup2; against a random walk, the forecast that tomorrow's implied vol equals today's.</p>
+        <div class="table-wrap">
+        <table>
+          <thead><tr><th>Model</th><th>RMSE (vol pts)</th><th>OOS R&sup2; vs random walk</th></tr></thead>
+          <tbody>
+            <tr><td>Random walk</td><td>7.40</td><td>0</td></tr>
+            <tr><td><strong>Heston (mean reversion)</strong></td><td><strong>6.96</strong></td><td><strong>+10.6%</strong></td></tr>
+            <tr><td>+ second factor (double Heston)</td><td>6.93</td><td>+10.0%</td></tr>
+            <tr><td>+ jumps (Bates proxy)</td><td>6.99</td><td>+9.7%</td></tr>
+            <tr><td>+ return trend (momentum)</td><td>7.00</td><td>+9.5%</td></tr>
+            <tr><td>All modifications together</td><td>7.27</td><td>&minus;0.8%</td></tr>
+            <tr><td>Elastic net (all features)</td><td>7.06</td><td>+7.5%</td></tr>
+            <tr><td>Gradient boosting (all features)</td><td>7.72</td><td>&minus;11.1%</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <p>Heston's mean reversion beats the random walk in 16 of 18 markets. No single extension did significantly better. Stacking all of them overfit, and regularisation fixed most of that but still didn't beat Heston. For the VIX alone, where the option term structure (VIX9D/3M/6M) is directly observable, a genuine second variance factor does show up: R&sup2; rises from 17.3% to 19.4%.</p>
+
+        <h4>2. Pricing the smile: jumps matter most</h4>
+        <p>I calibrated Heston, Bates (Heston plus jumps) and double Heston to option prices using Fourier pricing. I started with a single SPY chain of 219 options across 8 expiries. There, Bates cut the leave-one-expiry-out smile error by 32%. It does this with a rare crash (about one every 10&ndash;30 years, average size around &minus;41%), which produces the steep short-dated skew. Plain Heston can only match that skew with an implausibly large vol-of-vol.</p>
+        <p><strong>New: a full year of OptionMetrics data.</strong> One day is an anecdote, so I recalibrated every trading day of 2024 on SPX options (252 days, about 220 options a day). The result held up. The average in-sample error was 1.15 vol points for Heston, 0.47 for Bates and 0.46 for double Heston. The fitted jump parameters were stable from day to day, while double Heston kept hitting its parameter bounds, a sign it is too flexible.</p>
+        <p>The year of data also allowed an out-of-sample test: calibrate today, then predict tomorrow's smile. Bates (0.57 vol points) beat Heston (0.82). But a simple sticky-strike rule, which just keeps each strike's implied vol unchanged, beat every model (0.34). Structural models explain the shape of the smile well, but over a single day they don't beat simple practitioner rules.</p>
+
+        <h4>3. Momentum: real in volatility, already priced, absent in returns</h4>
+        <ul>
+          <li><strong>Returns (48 assets):</strong> no predictability. Pooled out-of-sample R&sup2; was negative. Only 2&ndash;6 of 48 assets passed a 5% test, about what chance alone would give. A diversified trend-following portfolio (Sharpe 0.55&ndash;0.71) did not beat buy-and-hold (0.75).</li>
+          <li><strong>Realised volatility (18 markets):</strong> a downside-trend term significantly improved forecasts built only on past prices (pooled t&nbsp;=&nbsp;&minus;2.84, better in 13 of 18 markets). Once implied vol was in the model, the gain disappeared (t&nbsp;=&nbsp;&minus;0.57): <strong>the option market already prices it.</strong> Gold and silver showed the opposite sign: their volatility rises after rallies.</li>
+          <li><strong>Implied vol is the best single forecast of realised vol</strong>, beating the best model built on past prices in 12 of 18 markets.</li>
+        </ul>
+
+        <h4>4. Machine learning: the setup matters more than the model</h4>
+        <ul>
+          <li><strong>Gradient boosting on one market at a time</strong> did significantly worse than linear models. Trees can't extrapolate past the largest values they've seen, so they break down in volatility spikes. A <strong>single pooled, scale-free model</strong> trained on all 18 markets, with features measured relative to implied vol, matched the option market's own forecast.</li>
+          <li><strong>Google's TimesFM foundation model</strong> on 20 global indices lost to the classic HAR model when used on its own. A small detail drove part of that. Its default output is the median, which runs too low for volatility because volatility spikes upward. Averaging TimesFM with HAR beat HAR in all 20 markets (pooled Diebold&ndash;Mariano t&nbsp;=&nbsp;&minus;7.75). Fine-tuning on A100 GPUs on MSU's HPC cluster didn't help.</li>
+        </ul>
+
+        <h4>5. Testing my tests with Monte Carlo</h4>
+        <p>I simulated Heston markets with a known amount of momentum and ran them through the same pipeline: 5,000 paths per setting, run as SLURM job arrays on the HPC cluster.</p>
+        <ul>
+          <li>The test without implied vol came out positive <strong>81% of the time even with zero momentum</strong>. It was picking up the leverage effect: falling prices raise variance. So my real-data t&nbsp;=&nbsp;&minus;2.84 is consistent with leverage alone.</li>
+          <li>The test that includes implied vol is correctly sized (1.7% false positives), but it catches realistic, unpriced momentum only about 10% of the time. So "already priced by options" fits the data, but the data don't prove it.</li>
+          <li>Momentum in the drift was undetectable even with 30 years of data. The "no return predictability" result tells me little either way.</li>
+        </ul>
+
+        <h4>6. The profit that wasn't: delta-hedged option selling</h4>
+        <p>I sold a one-month at-the-money straddle every day in each of the 18 markets and delta-hedged it daily, with bid/ask and hedging costs included. I fixed the design before the first run.</p>
+        <ul>
+          <li><strong>Priced at the Cboe vol index,</strong> it looked great: +2.7 vol points per trade (t&nbsp;=&nbsp;14), Sharpe 1.97, profitable in 16 of 18 markets. Hedging made the P&amp;L 2.3&times; less volatile and cut the worst loss from &minus;112 to &minus;41 vol points.</li>
+          <li>But a Cboe index prices out-of-the-money options and sits <em>above</em> at-the-money vol. On the one day I checked, the VIX was 19.45 while at-the-money vol was 15.4.</li>
+          <li><strong>New: the OptionMetrics rerun settled it.</strong> I priced the same trades at the actual 30-day at-the-money implied vol and compared on the same dates. The profit fell from +2.33 (t&nbsp;=&nbsp;11) to <strong>+0.10 (t&nbsp;=&nbsp;0.4)</strong>, with a Sharpe ratio of 0.07. Before bid/ask it still earned +1.1 (t&nbsp;=&nbsp;4.6). The variance risk premium is real, but the option spread eats it. Most of the apparent edge came from using the wrong price.</li>
+          <li>Forecast-based filters (skipping trades when a model predicts high vol) lowered P&amp;L in every version. The skipped days come right after vol spikes, which is when selling pays the most.</li>
+        </ul>
+
+        <h4>7. How stocks move together</h4>
+        <p>Across 469 S&amp;P&nbsp;500 stocks, random matrix theory (Marchenko&ndash;Pastur) separates about 21 real factors from noise. Correlations jump in crashes far more than a Gaussian model would predict. A downside-trend signal also improves next-month correlation forecasts (R&sup2; from 26% to 31%).</p>
         <div class="gallery">
           <figure>
             <img src="images/web/corr-heatmap-sector.png" alt="Heatmap of daily log-return correlations for 469 S&amp;P 500 stocks, 2016 to 2026, ordered by GICS sector; sector blocks show higher correlation along the diagonal" loading="lazy">
@@ -55,8 +110,19 @@
             <figcaption>In joint selloffs, stocks move together far more than a Gaussian model allows.</figcaption>
           </figure>
         </div>
-        <p class="tools">Tools: Python (NumPy, pandas, SciPy, scikit-learn, PyTorch), Heston/Bates models, Fourier option pricing, HAR, GARCH, Monte Carlo, HPC (SLURM, A100)</p>
-        <!-- TODO: add GitHub link once github.com/prakafle/heston-momentum is public -->
+
+        <h4>What's next: pre-registered tests</h4>
+        <p>Before looking at any of the results, I wrote down three tests on the OptionMetrics data (<a href="https://github.com/prakafle/heston-momentum/blob/main/PREREGISTRATION_WRDS.md">pre-registration</a>):</p>
+        <ul>
+          <li><strong>Does the option market price momentum correctly?</strong> After a downtrend, compare the forward variance implied by options (30 to 91 days) with the variance that is actually realised, for SPX from 1996 to 2025, then replicate on the other 17 markets.</li>
+          <li><strong>Do jumps matter more in crises?</strong> Test whether Bates's advantage over Heston grows with the VIX, including 2008, 2020 and 2022.</li>
+          <li><strong>Does the option-implied jump premium predict S&amp;P&nbsp;500 returns?</strong> Use the same walk-forward setup and Clark&ndash;West test as everything else.</li>
+        </ul>
+
+        <h4>What I took away</h4>
+        <p>Momentum is real in volatility but not in returns, and the option market already prices it. What adds predictive value is the <em>structure</em> of the known equation. Heston's mean reversion forecasts implied vol, and jumps price the smile. Extra state variables and naive machine learning mostly overfit. The hardest part wasn't building models. It was not fooling myself: preventing leaks, using the right t-stats, checking what price I was really trading at, and asking whether a test could have said "yes" at all.</p>
+        <p class="tools">Tools: Python (NumPy, pandas, SciPy, scikit-learn, PyTorch), Heston/Bates/double-Heston models, Fourier option pricing, HAR, GARCH, TimesFM, Monte Carlo, OptionMetrics (WRDS), HPC (SLURM, A100)</p>
+        <p><a href="https://github.com/prakafle/heston-momentum">Code, logs and full results on GitHub</a></p>
       </article>
 
       <article class="project">
@@ -81,7 +147,7 @@
 
   <footer>
     <div class="container">
-      &copy; 2026 Pratik Kafle &middot; Last updated: October 2026
+      &copy; 2026 Pratik Kafle &middot; Last updated: November 2026
     </div>
   </footer>
 </body>
