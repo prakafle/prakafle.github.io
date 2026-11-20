@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ML Projects | Pratik Kafle</title>
+  <meta name="description" content="Machine learning and data science projects by Pratik Kafle: interpretability, deep learning on satellite images, simulation-based inference, anomaly detection, and public-data analyses. Code on GitHub.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Source+Serif+4:wght@600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <div class="container">
+      <a href="index.html" class="site-title">Pratik Kafle</a>
+      <nav>
+        <a href="index.html">About</a>
+        <a href="background.html">Background</a>
+        <a href="quant.html">Quant Projects</a>
+        <a href="ml.html" class="active">ML Projects</a>
+        <a href="research.html">Research</a>
+        <a href="outreach.html">Outreach</a>
+        <a href="connect.html">Connect</a>
+      </nav>
+
+  <main class="container">
+    <h1>ML Projects</h1>
+    <p class="tagline">Machine learning and data science projects built on public data. Code, results and figures for each are on <a href="https://github.com/prakafle">GitHub</a>.</p>
+
+    <div>
+      <article class="project">
+        <h3>Grokking, Opened Up: How a Transformer Learns Modular Addition</h3>
+        <div class="where">Deep learning, interpretability · 2026 · <a href="https://github.com/prakafle/grokking-interpretability">github.com/prakafle/grokking-interpretability</a></div>
+        <p><strong>Problem:</strong> A small transformer trained on (a + b) mod 113 memorizes its training data in 200 steps but only generalizes thousands of steps later. What does it learn, and when?</p>
+        <p><strong>Approach:</strong> Trained a one-layer transformer from scratch in PyTorch (23 runs in parallel on the MSU HPCC), then took it apart with Fourier analysis, linear probes, and causal ablations of embeddings and neurons.</p>
+        <p><strong>Result:</strong> The network learns addition as rotation using 3 or 4 frequencies. Removing those 3 of 56 frequencies from the embedding drops test accuracy from 99.96% to 2.2%, while removing 3 random ones changes nothing. Progress measures show the general algorithm forming 1,350 to 2,650 steps before test accuracy jumps.</p>
+        <figure class="wide">
+          <img src="images/web/ml-grokking-progress.png" alt="Loss curves and progress measures during training: the restricted loss and probe R-squared improve before test accuracy jumps" loading="lazy">
+          <figcaption>Hidden progress: the key-frequency algorithm (green) forms before test accuracy (orange) jumps.</figcaption>
+        </figure>
+        <p class="tools">Tools: Python, PyTorch, mechanistic interpretability, SLURM</p>
+      </article>
+      <article class="project">
+        <h3>Solar Nowcasting from GOES-16 Satellite Images</h3>
+        <div class="where">Deep learning, computer vision · 2026 · <a href="https://github.com/prakafle/solar-nowcast">github.com/prakafle/solar-nowcast</a></div>
+        <p><strong>Problem:</strong> Clouds decide how much sunlight reaches a solar farm in the next few hours. Can a model watching satellite images forecast it better than ground sensors alone?</p>
+        <p><strong>Approach:</strong> Read 128 km crops of GOES-16 visible imagery every 30 minutes for 2022 to 2024 straight from NOAA's AWS bucket, paired them with ground measurements at the NOAA SURFRAD Penn State station, and trained a CNN-GRU and a video transformer with quantile outputs on an L40S GPU.</p>
+        <p><strong>Result:</strong> On the 2024 test year the satellite models cut error by 14 to 17% against persistence, about twice the gain of a gradient-boosting model that only sees ground data. The simpler CNN-GRU edged out the transformer, and 80% intervals covered 73 to 78%, slightly overconfident.</p>
+        <figure class="wide">
+          <img src="images/web/ml-nowcast-skill.png" alt="Forecast skill and interval coverage by horizon for three models" loading="lazy">
+          <figcaption>Skill against persistence (left) and coverage of 80% intervals (right), 30 minutes to 4 hours ahead.</figcaption>
+        </figure>
+        <p class="tools">Tools: Python, PyTorch, CNN, transformer, LightGBM, pvlib, AWS open data</p>
+      </article>
+      <article class="project">
+        <h3>Simulation-Based Inference with Normalizing Flows</h3>
+        <div class="where">Deep learning, Bayesian inference · 2026 · <a href="https://github.com/prakafle/sbi-flows">github.com/prakafle/sbi-flows</a></div>
+        <p><strong>Problem:</strong> Neural networks can return a full posterior in a fraction of a second, but are their error bars right?</p>
+        <p><strong>Approach:</strong> Trained a CNN plus neural spline flow on fresh simulations of a gravitational-wave-like chirp in noise, then tested calibration, compared against nested sampling on the exact likelihood, and tested it on data with the wrong noise model.</p>
+        <p><strong>Result:</strong> Well calibrated on average (90% intervals cover 90.9%) and about 300 times faster than nested sampling. With correlated noise it was never trained on, 90% intervals cover only 69%: calibration in-distribution says nothing about shifted data.</p>
+        <figure class="wide">
+          <img src="images/web/ml-sbi-coverage.png" alt="Coverage curves for white noise, red noise and glitches" loading="lazy">
+          <figcaption>Coverage holds on data like the training data and breaks when the noise model is wrong.</figcaption>
+        </figure>
+        <p class="tools">Tools: Python, PyTorch, zuko, dynesty, simulation-based calibration</p>
+      </article>
+      <article class="project">
+        <h3>Anomaly Detection on the LHC Olympics Dataset</h3>
+        <div class="where">Machine learning, particle physics · 2026 · <a href="https://github.com/prakafle/lhco-anomaly">github.com/prakafle/lhco-anomaly</a></div>
+        <p><strong>Problem:</strong> Can a search find a new particle without being told what it looks like?</p>
+        <p><strong>Approach:</strong> Benchmarked weakly supervised (CWoLa) and normalizing-flow (CATHODE) anomaly detection against idealized and fully supervised references on 1.1 million simulated events, with signal injected at levels too small to see by eye.</p>
+        <p><strong>Result:</strong> With no signal, no method invents one. Around 1% signal-to-background the best methods turn a 3 sigma excess into 18 to 35 sigma. My CATHODE implementation underperforms the original paper, which points to the flow's background model as the weak link.</p>
+        <figure class="wide">
+          <img src="images/web/ml-lhco-sic.png" alt="Significance improvement against signal fraction for each method" loading="lazy">
+          <figcaption>Anomaly detectors need a minimum amount of signal before they help.</figcaption>
+        </figure>
+        <p class="tools">Tools: Python, PyTorch, zuko, scikit-learn, boosted trees</p>
+      </article>
+      <article class="project">
+        <h3>How Much Solar Power Does Wildfire Smoke Cost?</h3>
+        <div class="where">Data science, panel regression · 2026 · <a href="https://github.com/prakafle/smoke-solar">github.com/prakafle/smoke-solar</a></div>
+        <p><strong>Problem:</strong> Wildfire smoke dims the sun. How much does it lower utility-scale solar output across the US grid?</p>
+        <p><strong>Approach:</strong> Joined NOAA satellite smoke polygons, hourly EIA-930 solar generation for 21 grid operators and ERA5 weather from 2018 to 2025, and fit a fixed-effects panel regression with weather controls, robustness checks and a placebo test.</p>
+        <p><strong>Result:</strong> Heavy smoke cuts daily solar output by 11% (95% CI 9 to 13%). A naive comparison gets the sign wrong because smoke days are often sunny. On California's orange-sky day in September 2020, output was about 40% below the no-smoke expectation.</p>
+        <figure class="wide">
+          <img src="images/web/ml-smoke-events.png" alt="Actual and expected solar output in California 2020 and PJM 2023 during smoke events" loading="lazy">
+          <figcaption>Actual solar output (black) against the model's no-smoke expectation (blue) during two smoke events.</figcaption>
+        </figure>
+        <p class="tools">Tools: Python, pandas, statsmodels, GeoPandas, DuckDB</p>
+      </article>
+      <article class="project">
+        <h3>Same Procedure, Different Price: Michigan Hospital Prices</h3>
+        <div class="where">Data science, messy data · 2026 · <a href="https://github.com/prakafle/hospital-prices">github.com/prakafle/hospital-prices</a></div>
+        <p><strong>Problem:</strong> Hospitals must now publish every price they negotiate with insurers, in huge and inconsistent files. How much do prices vary, and why?</p>
+        <p><strong>Approach:</strong> Streamed and filtered 54 price files from four Michigan health systems (up to 1.3 GB each) with DuckDB, cleaned payer names, modifiers and billing classes, and decomposed the variation in price.</p>
+        <p><strong>Result:</strong> For the median service the 90th percentile price is 5.6 times the 10th. Most of the spread comes from service-specific contract terms, not from which hospital or insurer. Commercial insurers pay a median 1.6 times the Medicare Advantage price for the same service at the same hospital.</p>
+        <figure class="wide">
+          <img src="images/web/ml-hospital-dispersion.png" alt="Negotiated commercial prices for 15 common services across hospitals and insurers" loading="lazy">
+          <figcaption>Each dot is one hospital, insurer and plan. Orange lines span the 10th to 90th percentile.</figcaption>
+        </figure>
+        <p class="tools">Tools: Python, DuckDB, pandas, data cleaning</p>
+      </article>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      &copy; 2026 Pratik Kafle &middot; Last updated: November 2026
+    </div>
+  </footer>
+</body>
+</html>
