@@ -101,6 +101,18 @@
         </figure>
         <p class="tools">Tools: Python, DuckDB, pandas, data cleaning</p>
       </article>
+      <article class="project">
+        <h3>GridCast: Day-Ahead Electricity Demand for 39 US Grid Operators</h3>
+        <div class="where">Data science, forecasting · 2026 · <a href="https://github.com/prakafle/gridcast">github.com/prakafle/gridcast</a></div>
+        <p><strong>Problem:</strong> Every US grid operator publishes a forecast of tomorrow's hourly demand. Can one model trained on all of them, using only public data and the weather forecast an operator would have had, match or improve on those forecasts, with honest uncertainty?</p>
+        <p><strong>Approach:</strong> Built a 3.3 million row hourly dataset from EIA-930 grid data with DuckDB, plus observed and day-ahead forecast temperatures for 59 weather stations. Trained one pooled LightGBM quantile model on a scale-free target, tested it walk-forward on 2022 to August 2025 with significance tests per operator, and calibrated its intervals with split and adaptive conformal prediction. The full run took 10 hours on the MSU HPCC.</p>
+        <p><strong>Result:</strong> The pooled model alone roughly matched the operators (load-weighted error 4.0% vs 4.1%) but was significantly worse for 21 of 39 of them. Averaging it with the operator's forecast cut error to 3.3% and beat the operator in 28 of 39. Raw 90% intervals covered only 79%. Conformal calibration brought every operator to between 85% and 95%. The model failed during Winter Storm Elliott, and the README says so. A weather-normalized growth index shows Texas demand up 32% since 2016-2018.</p>
+        <figure>
+          <img src="images/web/ml-gridcast-coverage.png" alt="Coverage of 90 percent intervals per grid operator for raw quantiles, split conformal and adaptive conformal" loading="lazy">
+          <figcaption>Coverage of 90% intervals across 39 operators, before and after conformal calibration.</figcaption>
+        </figure>
+        <p class="tools">Tools: Python, LightGBM, DuckDB, SQL, conformal prediction, SLURM</p>
+      </article>
     </div>
   </main>
 
